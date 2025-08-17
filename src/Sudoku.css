@@ -156,3 +156,27 @@
   box-shadow: none;
   padding: 0; /* Ensure no bulging */
 }
+
+/* Revert the gradient background to the previous style */
+.cover-page {
+  background: linear-gradient(135deg, #FFB6C1, #87CEEB); /* Pink to sky blue gradient */
+}
+
+/* Style for cover page buttons */
+.cover-page button {
+  background: linear-gradient(135deg, #FF69B4, #4682B4); /* Hot pink to steel blue gradient */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.cover-page button:hover {
+  background: linear-gradient(135deg, #FF1493, #4169E1); /* Deep pink to royal blue gradient */
+  transform: scale(1.05);
+}
