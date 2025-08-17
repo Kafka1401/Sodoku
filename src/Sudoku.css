@@ -13,6 +13,7 @@
   height: 40px;
   text-align: center;
   padding: 0;
+  box-sizing: border-box; /* Include border in cell dimensions */
 }
 
 .sudoku-board td.invalid {
@@ -151,7 +152,7 @@
 
 /* Highlight the selected cell in the Sudoku board */
 .sudoku-board td.selected {
-  border: 2px solid #7A85C1;
+  border: 2px solid #000080; /* Dark navy blue */
   box-shadow: none;
   padding: 0; /* Ensure no bulging */
 }
