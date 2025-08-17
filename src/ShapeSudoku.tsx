@@ -127,8 +127,8 @@ function generatePuzzleBoardFromSolution(solution: string[][]): string[][] {
 }
 
 const ShapeSudoku = () => {
-  const [solutionBoard] = useState<string[][]>(() => generateFullBoard());
-  const [initialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
+  const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
+  const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
   const [board, setBoard] = useState<string[][]>(initialBoard);
   const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
@@ -149,68 +149,83 @@ const ShapeSudoku = () => {
     setBoard(newBoard);
   };
 
+  const handleNewGame = () => {
+    const newSolution = generateFullBoard();
+    const newInitial = generatePuzzleBoardFromSolution(newSolution);
+    setSolutionBoard(newSolution);
+    setInitialBoard(newInitial);
+    setBoard(newInitial);
+    setSelectedCell(null);
+    setSelectedShape(null);
+  };
+
   return (
-    <div className="sudoku-container">
-      <h2>6x6 Shapes Sudoku</h2>
-      <table className="sudoku-board">
-        <tbody>
-          {board.map((row, i) => (
-            <tr key={i}>
-              {row.map((cell, j) => {
-                const isPrefilled = initialBoard[i][j] !== '';
-                const isIncorrect = !isPrefilled && cell !== '' && (cell !== solutionBoard[i][j] || !isValid(board, i, j, cell));
-                let cellClass = '';
-                if (i % 2 === 1 && i !== 5) cellClass += ' bold-bottom';
-                if (j % 3 === 2 && j !== 5) cellClass += ' bold-right';
-                if (i === 0) cellClass += ' bold-top';
-                if (i === 5) cellClass += ' bold-bottom';
-                if (j === 0) cellClass += ' bold-left';
-                if (j === 5) cellClass += ' bold-right';
-                if (isPrefilled) cellClass += ' prefilled';
-                if (isIncorrect) cellClass += ' invalid';
-                if (selectedCell && selectedCell.row === i && selectedCell.col === j) cellClass += ' selected';
-                const displayValue = isPrefilled ? initialBoard[i][j] : cell;
-                return (
-                  <td key={j} className={cellClass.trim()} onClick={() => handleCellClick(i, j)}>
-                    {displayValue ? renderShape(displayValue) : null}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="number-array-2x3">
-        <table>
+    <>
+      <button className="newgame-btn" style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}} onClick={handleNewGame}>
+        New Game
+      </button>
+      <div className="sudoku-container">
+        <h2>6x6 Shapes Sudoku</h2>
+        <table className="sudoku-board">
           <tbody>
-            <tr>
-              {SHAPES.slice(0, 3).map((shape) => (
-                <td key={shape}>
-                  <button
-                    className={`number-btn${selectedShape === shape ? ' selected' : ''}`}
-                    onClick={e => { handleShapeClick(shape); e.currentTarget.blur(); }}
-                  >
-                    {renderShape(shape)}
-                  </button>
-                </td>
-              ))}
-            </tr>
-            <tr>
-              {SHAPES.slice(3).map((shape) => (
-                <td key={shape}>
-                  <button
-                    className={`number-btn${selectedShape === shape ? ' selected' : ''}`}
-                    onClick={e => { handleShapeClick(shape); e.currentTarget.blur(); }}
-                  >
-                    {renderShape(shape)}
-                  </button>
-                </td>
-              ))}
-            </tr>
+            {board.map((row, i) => (
+              <tr key={i}>
+                {row.map((cell, j) => {
+                  const isPrefilled = initialBoard[i][j] !== '';
+                  const isIncorrect = !isPrefilled && cell !== '' && (cell !== solutionBoard[i][j] || !isValid(board, i, j, cell));
+                  let cellClass = '';
+                  if (i % 2 === 1 && i !== 5) cellClass += ' bold-bottom';
+                  if (j % 3 === 2 && j !== 5) cellClass += ' bold-right';
+                  if (i === 0) cellClass += ' bold-top';
+                  if (i === 5) cellClass += ' bold-bottom';
+                  if (j === 0) cellClass += ' bold-left';
+                  if (j === 5) cellClass += ' bold-right';
+                  if (isPrefilled) cellClass += ' prefilled';
+                  if (isIncorrect) cellClass += ' invalid';
+                  if (selectedCell && selectedCell.row === i && selectedCell.col === j) cellClass += ' selected';
+                  const displayValue = isPrefilled ? initialBoard[i][j] : cell;
+                  return (
+                    <td key={j} className={cellClass.trim()} onClick={() => handleCellClick(i, j)}>
+                      {displayValue ? renderShape(displayValue) : null}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
           </tbody>
         </table>
+        <div className="number-array-2x3">
+          <table>
+            <tbody>
+              <tr>
+                {SHAPES.slice(0, 3).map((shape) => (
+                  <td key={shape}>
+                    <button
+                      className={`number-btn${selectedShape === shape ? ' selected' : ''}`}
+                      onClick={e => { handleShapeClick(shape); e.currentTarget.blur(); }}
+                    >
+                      {renderShape(shape)}
+                    </button>
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                {SHAPES.slice(3).map((shape) => (
+                  <td key={shape}>
+                    <button
+                      className={`number-btn${selectedShape === shape ? ' selected' : ''}`}
+                      onClick={e => { handleShapeClick(shape); e.currentTarget.blur(); }}
+                    >
+                      {renderShape(shape)}
+                    </button>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
