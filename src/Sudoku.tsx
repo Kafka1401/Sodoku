@@ -96,33 +96,6 @@ function hasUniqueSolution(board: string[][]): boolean {
   return count === 1;
 }
 
-function generatePuzzleBoard(): string[][] {
-  let board = generateFullBoard();
-  let puzzle = board.map(row => [...row]);
-  // Try to remove as many cells as possible while keeping a unique solution
-  let cells = [];
-  for (let i = 0; i < 6; i++) {
-    for (let j = 0; j < 6; j++) {
-      cells.push([i, j]);
-    }
-  }
-  // Shuffle cells for random removal order
-  for (let k = cells.length - 1; k > 0; k--) {
-    const l = Math.floor(Math.random() * (k + 1));
-    [cells[k], cells[l]] = [cells[l], cells[k]];
-  }
-  for (const [i, j] of cells) {
-    const backup = puzzle[i][j];
-    puzzle[i][j] = '';
-    if (!hasUniqueSolution(puzzle)) {
-      puzzle[i][j] = backup;
-    }
-  }
-  return puzzle;
-}
-
-
-
 function Sudoku() {
   const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
   const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
@@ -206,25 +179,6 @@ function Sudoku() {
     // Check for completion
     if (isBoardComplete(newBoard)) {
       setCompleted(true);
-    }
-  };
-
-  const handleChange = (row: number, col: number, value: string) => {
-    if (initialBoard[row][col] !== '') return;
-    if (value === '' || /^[1-6]$/.test(value)) {
-      // Start timer on first move
-      if (!timerActive) {
-        setStartTime(Date.now());
-        setTimerActive(true);
-      }
-      const newBoard = board.map((r, i) =>
-        r.map((cell, j) => (i === row && j === col ? value : cell))
-      );
-      setBoard(newBoard);
-      // Check for completion
-      if (isBoardComplete(newBoard)) {
-        setCompleted(true);
-      }
     }
   };
 
