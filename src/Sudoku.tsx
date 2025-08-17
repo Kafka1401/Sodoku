@@ -1,48 +1,18 @@
-// Helper to generate a puzzle from a solution board, ensuring unique solution
-function generatePuzzleBoardFromSolution(solution: string[][]): string[][] {
-  let puzzle = solution.map(row => [...row]);
-  let cells = [];
-  for (let i = 0; i < 6; i++) {
-    for (let j = 0; j < 6; j++) {
-      cells.push([i, j]);
-    }
-  }
-  // Shuffle cells for random removal order
-  for (let k = cells.length - 1; k > 0; k--) {
-    const l = Math.floor(Math.random() * (k + 1));
-    [cells[k], cells[l]] = [cells[l], cells[k]];
-  }
-  for (const [i, j] of cells) {
-    const backup = puzzle[i][j];
-    puzzle[i][j] = '';
-    if (!hasUniqueSolution(puzzle)) {
-      puzzle[i][j] = backup;
-    }
-  }
-  return puzzle;
-}
 import { useState, useEffect, useRef } from 'react';
 import './Sudoku.css';
 
 
 function generateFullBoard(): string[][] {
-  const board = Array.from({ length: 6 }, () => Array(6).fill(''));
-  const nums = ['1', '2', '3', '4', '5', '6'];
-
-  function fill(row: number, col: number): boolean {
-    if (row === 6) return true;
-    if (col === 6) return fill(row + 1, 0);
-    const shuffled = nums.slice().sort(() => Math.random() - 0.5);
-    for (const num of shuffled) {
-      if (isValid(board, row, col, num)) {
-        board[row][col] = num;
-        if (fill(row, col + 1)) return true;
-        board[row][col] = '';
-      }
-    }
-    return false;
-  }
-  fill(0, 0);
+  // Create a simple valid board for testing
+  const board = [
+    ['1', '2', '3', '4', '5', '6'],
+    ['4', '5', '6', '1', '2', '3'],
+    ['2', '3', '1', '5', '6', '4'],
+    ['5', '6', '4', '2', '3', '1'],
+    ['3', '1', '2', '6', '4', '5'],
+    ['6', '4', '5', '3', '1', '2']
+  ];
+  console.log('Generated board:', board);
   return board;
 }
 
@@ -121,11 +91,41 @@ function generatePuzzleBoard(): string[][] {
   return puzzle;
 }
 
+// Helper to generate a puzzle from a solution board, ensuring unique solution
+function generatePuzzleBoardFromSolution(solution: string[][]): string[][] {
+  // Create a simple puzzle by removing some numbers
+  const puzzle = solution.map(row => [...row]);
+  // Remove some cells for the puzzle
+  puzzle[0][0] = '';
+  puzzle[0][2] = '';
+  puzzle[1][1] = '';
+  puzzle[1][3] = '';
+  puzzle[2][0] = '';
+  puzzle[2][4] = '';
+  puzzle[3][1] = '';
+  puzzle[3][5] = '';
+  puzzle[4][2] = '';
+  puzzle[4][4] = '';
+  puzzle[5][0] = '';
+  puzzle[5][3] = '';
+  console.log('Generated puzzle:', puzzle);
+  return puzzle;
+}
+
 
 
 function Sudoku() {
-  const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
-  const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
+  // Simple test to see if component renders
+  console.log('Sudoku component is rendering');
+  
+  const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => {
+    console.log('Generating solution board');
+    return generateFullBoard();
+  });
+  const [initialBoard, setInitialBoard] = useState<string[][]>(() => {
+    console.log('Generating initial board');
+    return generatePuzzleBoardFromSolution(solutionBoard);
+  });
   const [board, setBoard] = useState<string[][]>(initialBoard);
   // When variant changes, start a new puzzle
   // New game handler: always generate a new solution and puzzle
@@ -270,15 +270,17 @@ function Sudoku() {
 
   return (
     <div className="sudoku-container">
+      <h2>6x6 Sudoku - Debug Mode</h2>
+      <p>Board state: {board ? 'Loaded' : 'Not loaded'}</p>
+      <p>Solution board: {solutionBoard ? 'Loaded' : 'Not loaded'}</p>
       <button
         className="newgame-btn"
         onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
       >New Game</button>
-      <h2>6x6 Sudoku</h2>
       <div className="timer-top-right">Time: {formatTime(completed && endTime ? endTime - (startTime ?? 0) : elapsed)}</div>
       <table className="sudoku-board">
         <tbody>
-          {board.map((row, i) => (
+          {board && board.map((row, i) => (
             <tr key={i}>
               {row.map((cell, j) => {
                 let cellClass = '';
@@ -307,7 +309,7 @@ function Sudoku() {
                 );
               })}
             </tr>
-          ))}
+          )) || <tr><td colSpan={6}>Loading...</td></tr>}
         </tbody>
       </table>
       {/* 2x3 number array for selection */}
