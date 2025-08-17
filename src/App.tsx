@@ -1,19 +1,27 @@
 
+
 import React, { useState } from 'react';
 import Sudoku from './Sudoku';
+import ShapeSudoku from './ShapeSudoku';
 import CoverPage from './CoverPage';
 import './App.css';
 
 function App() {
-  const [showGame, setShowGame] = useState(false);
+  const [variant, setVariant] = useState<'numbers' | 'shapes' | null>(null);
 
-  const handleSelect = () => {
-    setShowGame(true);
+  const handleSelect = (selectedVariant: 'numbers' | 'shapes') => {
+    setVariant(selectedVariant);
   };
 
   return (
     <>
-      {showGame ? <Sudoku /> : <CoverPage onSelect={handleSelect} />}
+      {variant === null ? (
+        <CoverPage onSelect={handleSelect} />
+      ) : variant === 'numbers' ? (
+        <Sudoku />
+      ) : (
+        <ShapeSudoku />
+      )}
     </>
   );
 }
