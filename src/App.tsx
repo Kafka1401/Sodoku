@@ -1,7 +1,6 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Sudoku from './Sudoku';
-import ShapeSudoku from './ShapeSudoku';
 import CoverPage from './CoverPage';
 import './App.css';
 
@@ -9,17 +8,18 @@ function App() {
   const [showCover, setShowCover] = useState(true);
   const [variant, setVariant] = useState<'classic' | 'shapes'>('classic');
 
-  const handleStart = (selectedVariant?: 'shapes') => {
-    setVariant(selectedVariant === 'shapes' ? 'shapes' : 'classic');
+  const handleStart = (variant: 'classic' | 'shapes') => {
+    setVariant(variant);
     setShowCover(false);
   };
+
 
   return (
     <>
       {showCover ? (
         <CoverPage onStart={handleStart} />
       ) : (
-        variant === 'shapes' ? <ShapeSudoku /> : <Sudoku variant={variant} />
+        <Sudoku variant={variant} />
       )}
     </>
   );

@@ -103,18 +103,15 @@ interface SudokuProps {
 }
 
 function Sudoku({ variant = 'classic' }: SudokuProps) {
-  // Expose variant globally for isValid logic
-  if (typeof window !== 'undefined') {
-    window.variant = variant;
-  }
+  // variant is passed as prop and used locally
   const [initialBoard, setInitialBoard] = useState<string[][]>(generatePuzzleBoard());
-  const [solutionBoard, setSolutionBoard] = useState<string[][]>(generateFullBoard());
+  // Removed unused solutionBoard state
   const [board, setBoard] = useState<string[][]>(initialBoard);
   // When variant changes, start a new puzzle
   useEffect(() => {
     const newInitialBoard = generatePuzzleBoard();
     setInitialBoard(newInitialBoard);
-    setSolutionBoard(generateFullBoard());
+  // Removed setSolutionBoard (no longer needed)
     setBoard(newInitialBoard);
     setCompleted(false);
     setStartTime(null);
@@ -136,7 +133,7 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
   // ...existing code...
   const newInitialBoard = generatePuzzleBoard();
   setInitialBoard(newInitialBoard);
-  setSolutionBoard(generateFullBoard());
+  // Removed setSolutionBoard (no longer needed)
   setBoard(newInitialBoard);
   setCompleted(false);
   setStartTime(null);
@@ -203,24 +200,7 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
     }
   };
 
-  const handleChange = (row: number, col: number, value: string) => {
-    if (initialBoard[row][col] !== '') return;
-    if (value === '' || /^[1-6]$/.test(value)) {
-      // Start timer on first move
-      if (!timerActive) {
-        setStartTime(Date.now());
-        setTimerActive(true);
-      }
-      const newBoard = board.map((r, i) =>
-        r.map((cell, j) => (i === row && j === col ? value : cell))
-      );
-      setBoard(newBoard);
-      // Check for completion
-      if (isBoardComplete(newBoard)) {
-        setCompleted(true);
-      }
-    }
-  };
+  // Removed unused handleChange function
 
   function isBoardComplete(board: string[][]): boolean {
     for (let i = 0; i < 6; i++) {
@@ -253,8 +233,8 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
             <tr key={i}>
               {row.map((cell, j) => {
                 let cellClass = '';
-                // Only apply bold border classes for classic variant
-                if (variant === 'classic') {
+                // Apply bold border classes for 2x3 inner grids for both classic and shapes variants
+                if (board.length === 6) {
                   if (i % 2 === 1 && i !== 5) cellClass += ' bold-bottom';
                   if (j % 3 === 2 && j !== 5) cellClass += ' bold-right';
                   if (i === 0) cellClass += ' bold-top';
@@ -273,7 +253,10 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
                 return (
                   <td key={j} className={cellClass.trim()} onClick={() => handleCellClick(i, j)}>
                     {variant === 'shapes' && displayValue ? (
-                      <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <span
+                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}
+                        className={isIncorrect ? 'invalid' : ''}
+                      >
                         <ShapeRenderer value={displayValue} />
                       </span>
                     ) : (
@@ -296,7 +279,7 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
         <table>
           <tbody>
             <tr>
-              {["1","2","3","X"].map((num, idx) => (
+              {["1","2","3","X"].map((num) => (
                 <td key={num}>
                   <button
                     className={`number-btn${selectedNumber === num ? ' selected' : ''}`}
@@ -308,7 +291,7 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
               ))}
             </tr>
             <tr>
-              {["4","5","6"].map((num, idx) => (
+              {["4","5","6"].map((num) => (
                 <td key={num}>
                   <button
                     className={`number-btn${selectedNumber === num ? ' selected' : ''}`}
