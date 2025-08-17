@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import Sudoku from './Sudoku';
+import ShapeSudoku from './ShapeSudoku';
 import CoverPage from './CoverPage';
 import './App.css';
 
@@ -18,7 +19,7 @@ function App() {
       {showCover ? (
         <CoverPage onStart={handleStart} />
       ) : (
-        <Sudoku variant={variant} />
+        variant === 'shapes' ? <ShapeSudoku /> : <Sudoku variant={variant} />
       )}
     </>
   );
