@@ -14,6 +14,10 @@
   text-align: center;
   padding: 0;
 }
+
+.sudoku-board td.invalid {
+  border: 2px solid #d32f2f !important;
+}
 .sudoku-board input {
   width: 38px;
   height: 38px;
@@ -143,4 +147,11 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   margin: 0 4px;
   cursor: pointer;
+}
+
+/* Highlight the selected cell in the Sudoku board */
+.sudoku-board td.selected {
+  border: 2px solid #7A85C1;
+  box-shadow: none;
+  padding: 0; /* Ensure no bulging */
 }
