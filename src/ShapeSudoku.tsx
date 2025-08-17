@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Sudoku.css';
 
 const SHAPES = [
@@ -132,21 +132,58 @@ const ShapeSudoku = () => {
   const [board, setBoard] = useState<string[][]>(initialBoard);
   const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
+  const [completed, setCompleted] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
+  const [timer, setTimer] = useState(0);
 
-  const handleCellClick = (row: number, col: number) => {
-    if (initialBoard[row][col] !== '') return;
-    setSelectedCell({ row, col });
-  };
+  useEffect(() => {
+    if (startTime && !completed) {
+      const interval = setInterval(() => {
+        setTimer(Date.now() - startTime);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [startTime, completed]);
 
+  // Check for completion
+  function isBoardComplete(board: string[][]) {
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 6; j++) {
+        if (board[i][j] !== solutionBoard[i][j]) return false;
+      }
+    }
+    return true;
+  }
+
+  // Update handleShapeClick to start timer and check completion
   const handleShapeClick = (shape: string) => {
     setSelectedShape(shape);
     if (!selectedCell) return;
     const { row, col } = selectedCell;
     if (initialBoard[row][col] !== '') return;
+    if (!startTime) setStartTime(Date.now());
     const newBoard = board.map((r, i) =>
       r.map((cell, j) => (i === row && j === col ? shape : cell))
     );
     setBoard(newBoard);
+    if (isBoardComplete(newBoard)) {
+      setCompleted(true);
+      setEndTime(Date.now());
+    }
+  };
+
+  // Update the formatTime function to display minutes:seconds format
+  function formatTime(ms: number) {
+    const sec = Math.floor(ms / 1000);
+    const min = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${min.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  const handleCellClick = (row: number, col: number) => {
+    if (initialBoard[row][col] !== '') return;
+    setSelectedCell({ row, col });
   };
 
   const handleNewGame = () => {
@@ -157,6 +194,9 @@ const ShapeSudoku = () => {
     setBoard(newInitial);
     setSelectedCell(null);
     setSelectedShape(null);
+    setCompleted(false);
+    setStartTime(null);
+    setEndTime(null);
   };
 
   return (
@@ -164,6 +204,9 @@ const ShapeSudoku = () => {
       <button className="newgame-btn" style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}} onClick={handleNewGame}>
         New Game
       </button>
+      <div className="timer-top-right" style={{position: 'fixed', top: 20, right: 40, fontSize: '1.2rem', fontWeight: 'bold', color: '#333', background: '#f5f5fa', padding: '8px 16px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', zIndex: 10}}>
+        Time: {formatTime(completed && endTime ? endTime - (startTime ?? 0) : timer)}
+      </div>
       <div className="sudoku-container">
         <h2>6x6 Shapes Sudoku</h2>
         <table className="sudoku-board">
@@ -224,6 +267,12 @@ const ShapeSudoku = () => {
             </tbody>
           </table>
         </div>
+        {completed && endTime && (
+          <div className="newgame-prompt">
+            <p>Congratulations! You completed the grid.</p>
+            <p>Time taken: {formatTime(endTime - (startTime ?? 0))}</p>
+          </div>
+        )}
       </div>
     </>
   );
