@@ -1,5 +1,29 @@
+// Helper to generate a puzzle from a solution board, ensuring unique solution
+function generatePuzzleBoardFromSolution(solution: string[][]): string[][] {
+  let puzzle = solution.map(row => [...row]);
+  let cells = [];
+  for (let i = 0; i < 6; i++) {
+    for (let j = 0; j < 6; j++) {
+      cells.push([i, j]);
+    }
+  }
+  // Shuffle cells for random removal order
+  for (let k = cells.length - 1; k > 0; k--) {
+    const l = Math.floor(Math.random() * (k + 1));
+    [cells[k], cells[l]] = [cells[l], cells[k]];
+  }
+  for (const [i, j] of cells) {
+    const backup = puzzle[i][j];
+    puzzle[i][j] = '';
+    if (!hasUniqueSolution(puzzle)) {
+      puzzle[i][j] = backup;
+    }
+  }
+  return puzzle;
+}
 import { useState, useEffect, useRef } from 'react';
 import './Sudoku.css';
+
 
 function generateFullBoard(): string[][] {
   const board = Array.from({ length: 6 }, () => Array(6).fill(''));
@@ -23,6 +47,7 @@ function generateFullBoard(): string[][] {
 }
 
 function isValid(board: string[][], row: number, col: number, value: string): boolean {
+  if (typeof value !== 'string') return false;
   // Check row
   for (let j = 0; j < 6; j++) {
     if (j !== col && board[row][j] === value) return false;
@@ -96,10 +121,27 @@ function generatePuzzleBoard(): string[][] {
   return puzzle;
 }
 
+
+
 function Sudoku() {
-  const [initialBoard, setInitialBoard] = useState<string[][]>(generatePuzzleBoard());
-  const [solutionBoard, setSolutionBoard] = useState<string[][]>(generateFullBoard());
+  const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
+  const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
   const [board, setBoard] = useState<string[][]>(initialBoard);
+  // When variant changes, start a new puzzle
+  // New game handler: always generate a new solution and puzzle
+  const handleNewGame = () => {
+    const newSolution = generateFullBoard();
+    setSolutionBoard(newSolution);
+    const newInitialBoard = generatePuzzleBoardFromSolution(newSolution);
+    setInitialBoard(newInitialBoard);
+    setBoard(newInitialBoard);
+    setCompleted(false);
+    setStartTime(null);
+    setEndTime(null);
+    setElapsed(0);
+    setTimerActive(false);
+    if (timerRef.current) window.clearInterval(timerRef.current);
+  };
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
@@ -109,19 +151,6 @@ function Sudoku() {
   const [selectedNumber, setSelectedNumber] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
 
-  const handleNewGame = () => {
-  // ...existing code...
-  const newInitialBoard = generatePuzzleBoard();
-  setInitialBoard(newInitialBoard);
-  setSolutionBoard(generateFullBoard());
-  setBoard(newInitialBoard);
-  setCompleted(false);
-  setStartTime(null);
-  setEndTime(null);
-  setElapsed(0);
-  setTimerActive(false);
-  if (timerRef.current) window.clearInterval(timerRef.current);
-  };
 
   useEffect(() => {
     if (timerActive && startTime !== null) {
@@ -199,11 +228,34 @@ function Sudoku() {
     }
   };
 
+  // Only highlight cell red if it violates Sudoku rules
+  function isCellInvalid(board: string[][], row: number, col: number, value: string): boolean {
+    if (value === '') return false;
+    // Check row
+    for (let j = 0; j < 6; j++) {
+      if (j !== col && board[row][j] === value) return true;
+    }
+    // Check column
+    for (let i = 0; i < 6; i++) {
+      if (i !== row && board[i][col] === value) return true;
+    }
+    // Check 2x3 box
+    const boxRow = Math.floor(row / 2) * 2;
+    const boxCol = Math.floor(col / 3) * 3;
+    for (let i = boxRow; i < boxRow + 2; i++) {
+      for (let j = boxCol; j < boxCol + 3; j++) {
+        if (i === row && j === col) continue;
+        if (board[i][j] === value) return true;
+      }
+    }
+    return false;
+  }
+
   function isBoardComplete(board: string[][]): boolean {
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 6; j++) {
         const value = board[i][j];
-        if (value === '' || !isValid(board, i, j, value)) return false;
+        if (value === '' || isCellInvalid(board, i, j, value)) return false;
       }
     }
     return true;
@@ -218,12 +270,12 @@ function Sudoku() {
 
   return (
     <div className="sudoku-container">
+      <button
+        className="newgame-btn"
+        onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
+      >New Game</button>
       <h2>6x6 Sudoku</h2>
       <div className="timer-top-right">Time: {formatTime(completed && endTime ? endTime - (startTime ?? 0) : elapsed)}</div>
-        <button
-          className="newgame-btn"
-          onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
-        >New Game</button>
       <table className="sudoku-board">
         <tbody>
           {board.map((row, i) => (
@@ -237,14 +289,16 @@ function Sudoku() {
                 if (j === 0) cellClass += ' bold-left';
                 if (j === 5) cellClass += ' bold-right';
                 const isPrefilled = initialBoard[i][j] !== '';
+                // Mark cell red if it is not prefilled, not empty, and does not match the solution
                 const isIncorrect = !isPrefilled && cell !== '' && cell !== solutionBoard[i][j];
                 let inputClass = isPrefilled ? 'prefilled' : '';
                 if (isIncorrect) inputClass += ' invalid';
                 if (selectedCell && selectedCell.row === i && selectedCell.col === j) inputClass += ' selected';
+                const displayValue = isPrefilled ? initialBoard[i][j] : cell;
                 return (
                   <td key={j} className={cellClass.trim()} onClick={() => handleCellClick(i, j)}>
                     <input
-                      value={isPrefilled ? initialBoard[i][j] : cell}
+                      value={displayValue}
                       readOnly
                       disabled={isPrefilled}
                       className={inputClass.trim()}
@@ -261,15 +315,28 @@ function Sudoku() {
         <table>
           <tbody>
             <tr>
-              <td><button className={`number-btn${selectedNumber === '1' ? ' selected' : ''}`} onClick={e => { handleNumberClick('1'); e.currentTarget.blur(); }}>1</button></td>
-              <td><button className={`number-btn${selectedNumber === '2' ? ' selected' : ''}`} onClick={e => { handleNumberClick('2'); e.currentTarget.blur(); }}>2</button></td>
-              <td><button className={`number-btn${selectedNumber === '3' ? ' selected' : ''}`} onClick={e => { handleNumberClick('3'); e.currentTarget.blur(); }}>3</button></td>
-              <td><button className={`number-btn${selectedNumber === 'X' ? ' selected' : ''}`} onClick={e => { handleNumberClick('X'); e.currentTarget.blur(); }}>&#10006;</button></td>
+              {["1","2","3","X"].map((num) => (
+                <td key={num}>
+                  <button
+                    className={`number-btn${selectedNumber === num ? ' selected' : ''}`}
+                    onClick={e => { handleNumberClick(num); e.currentTarget.blur(); }}
+                  >
+                    {num === 'X' ? <span>&#10006;</span> : num}
+                  </button>
+                </td>
+              ))}
             </tr>
             <tr>
-              <td><button className={`number-btn${selectedNumber === '4' ? ' selected' : ''}`} onClick={e => { handleNumberClick('4'); e.currentTarget.blur(); }}>4</button></td>
-              <td><button className={`number-btn${selectedNumber === '5' ? ' selected' : ''}`} onClick={e => { handleNumberClick('5'); e.currentTarget.blur(); }}>5</button></td>
-              <td><button className={`number-btn${selectedNumber === '6' ? ' selected' : ''}`} onClick={e => { handleNumberClick('6'); e.currentTarget.blur(); }}>6</button></td>
+              {["4","5","6"].map((num) => (
+                <td key={num}>
+                  <button
+                    className={`number-btn${selectedNumber === num ? ' selected' : ''}`}
+                    onClick={e => { handleNumberClick(num); e.currentTarget.blur(); }}
+                  >
+                    {num}
+                  </button>
+                </td>
+              ))}
             </tr>
           </tbody>
         </table>
