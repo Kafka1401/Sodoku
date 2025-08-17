@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './Sudoku.css';
+import ShapeRenderer from './ShapeRenderer';
 
 function generateFullBoard(): string[][] {
   const board = Array.from({ length: 6 }, () => Array(6).fill(''));
@@ -23,15 +24,16 @@ function generateFullBoard(): string[][] {
 }
 
 function isValid(board: string[][], row: number, col: number, value: string): boolean {
-  // Check row
+  if (typeof value !== 'string') return false;
+  // Always check row
   for (let j = 0; j < 6; j++) {
     if (j !== col && board[row][j] === value) return false;
   }
-  // Check column
+  // Always check column
   for (let i = 0; i < 6; i++) {
     if (i !== row && board[i][col] === value) return false;
   }
-  // Check 2x3 box
+  // Always check 2x3 box
   const boxRow = Math.floor(row / 2) * 2;
   const boxCol = Math.floor(col / 3) * 3;
   for (let i = boxRow; i < boxRow + 2; i++) {
@@ -96,10 +98,31 @@ function generatePuzzleBoard(): string[][] {
   return puzzle;
 }
 
-function Sudoku() {
+interface SudokuProps {
+  variant?: 'classic' | 'shapes';
+}
+
+function Sudoku({ variant = 'classic' }: SudokuProps) {
+  // Expose variant globally for isValid logic
+  if (typeof window !== 'undefined') {
+    window.variant = variant;
+  }
   const [initialBoard, setInitialBoard] = useState<string[][]>(generatePuzzleBoard());
   const [solutionBoard, setSolutionBoard] = useState<string[][]>(generateFullBoard());
   const [board, setBoard] = useState<string[][]>(initialBoard);
+  // When variant changes, start a new puzzle
+  useEffect(() => {
+    const newInitialBoard = generatePuzzleBoard();
+    setInitialBoard(newInitialBoard);
+    setSolutionBoard(generateFullBoard());
+    setBoard(newInitialBoard);
+    setCompleted(false);
+    setStartTime(null);
+    setEndTime(null);
+    setElapsed(0);
+    setTimerActive(false);
+    if (timerRef.current) window.clearInterval(timerRef.current);
+  }, [variant]);
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
@@ -218,12 +241,12 @@ function Sudoku() {
 
   return (
     <div className="sudoku-container">
+      <button
+        className="newgame-btn"
+        onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
+      >New Game</button>
       <h2>6x6 Sudoku</h2>
       <div className="timer-top-right">Time: {formatTime(completed && endTime ? endTime - (startTime ?? 0) : elapsed)}</div>
-        <button
-          className="newgame-btn"
-          onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
-        >New Game</button>
       <table className="sudoku-board">
         <tbody>
           {board.map((row, i) => (
@@ -237,18 +260,27 @@ function Sudoku() {
                 if (j === 0) cellClass += ' bold-left';
                 if (j === 5) cellClass += ' bold-right';
                 const isPrefilled = initialBoard[i][j] !== '';
-                const isIncorrect = !isPrefilled && cell !== '' && cell !== solutionBoard[i][j];
+                // Mark cell invalid only if it violates Sudoku rules
+                const isIncorrect = !isPrefilled && cell !== '' && !isValid(board, i, j, cell);
                 let inputClass = isPrefilled ? 'prefilled' : '';
                 if (isIncorrect) inputClass += ' invalid';
                 if (selectedCell && selectedCell.row === i && selectedCell.col === j) inputClass += ' selected';
+                // Render shape or number
+                const displayValue = isPrefilled ? initialBoard[i][j] : cell;
                 return (
                   <td key={j} className={cellClass.trim()} onClick={() => handleCellClick(i, j)}>
-                    <input
-                      value={isPrefilled ? initialBoard[i][j] : cell}
-                      readOnly
-                      disabled={isPrefilled}
-                      className={inputClass.trim()}
-                    />
+                    {variant === 'shapes' && displayValue ? (
+                      <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <ShapeRenderer value={displayValue} />
+                      </span>
+                    ) : (
+                      <input
+                        value={displayValue}
+                        readOnly
+                        disabled={isPrefilled}
+                        className={inputClass.trim()}
+                      />
+                    )}
                   </td>
                 );
               })}
@@ -261,15 +293,28 @@ function Sudoku() {
         <table>
           <tbody>
             <tr>
-              <td><button className={`number-btn${selectedNumber === '1' ? ' selected' : ''}`} onClick={e => { handleNumberClick('1'); e.currentTarget.blur(); }}>1</button></td>
-              <td><button className={`number-btn${selectedNumber === '2' ? ' selected' : ''}`} onClick={e => { handleNumberClick('2'); e.currentTarget.blur(); }}>2</button></td>
-              <td><button className={`number-btn${selectedNumber === '3' ? ' selected' : ''}`} onClick={e => { handleNumberClick('3'); e.currentTarget.blur(); }}>3</button></td>
-              <td><button className={`number-btn${selectedNumber === 'X' ? ' selected' : ''}`} onClick={e => { handleNumberClick('X'); e.currentTarget.blur(); }}>&#10006;</button></td>
+              {["1","2","3","X"].map((num, idx) => (
+                <td key={num}>
+                  <button
+                    className={`number-btn${selectedNumber === num ? ' selected' : ''}`}
+                    onClick={e => { handleNumberClick(num); e.currentTarget.blur(); }}
+                  >
+                    {variant === 'shapes' && num !== 'X' ? <ShapeRenderer value={num} /> : num === 'X' ? <span>&#10006;</span> : num}
+                  </button>
+                </td>
+              ))}
             </tr>
             <tr>
-              <td><button className={`number-btn${selectedNumber === '4' ? ' selected' : ''}`} onClick={e => { handleNumberClick('4'); e.currentTarget.blur(); }}>4</button></td>
-              <td><button className={`number-btn${selectedNumber === '5' ? ' selected' : ''}`} onClick={e => { handleNumberClick('5'); e.currentTarget.blur(); }}>5</button></td>
-              <td><button className={`number-btn${selectedNumber === '6' ? ' selected' : ''}`} onClick={e => { handleNumberClick('6'); e.currentTarget.blur(); }}>6</button></td>
+              {["4","5","6"].map((num, idx) => (
+                <td key={num}>
+                  <button
+                    className={`number-btn${selectedNumber === num ? ' selected' : ''}`}
+                    onClick={e => { handleNumberClick(num); e.currentTarget.blur(); }}
+                  >
+                    {variant === 'shapes' ? <ShapeRenderer value={num} /> : num}
+                  </button>
+                </td>
+              ))}
             </tr>
           </tbody>
         </table>

@@ -1,3 +1,82 @@
+.sudoku-board .bold-bottom {
+  border-bottom: 2.5px solid #1A2A80 !important;
+}
+.sudoku-board .bold-right {
+  border-right: 2.5px solid #1A2A80 !important;
+}
+.sudoku-board .bold-left {
+  border-left: 2.5px solid #1A2A80 !important;
+}
+.sudoku-board .bold-top {
+  border-top: 2.5px solid #1A2A80 !important;
+}
+/* Cover page styles */
+.cover-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #C5B0CD, #468A9A 80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.cover-content {
+  background: rgba(255,255,255,0.95);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+  padding: 48px 64px;
+  text-align: center;
+}
+.cover-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #468A9A;
+  margin-bottom: 16px;
+}
+.cover-subtitle {
+  font-size: 1.3rem;
+  color: #7A85C1;
+  margin-bottom: 32px;
+}
+.cover-start-btn {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background: #468A9A;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 36px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+  transition: background 0.2s, transform 0.1s;
+}
+.cover-start-btn:hover {
+  background: #5a6399;
+  transform: scale(1.05);
+}
+/* New Game button original style */
+.newgame-btn {
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: #468A9A;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  z-index: 10;
+  transition: background 0.2s;
+}
+.newgame-btn:hover {
+  background: #5a6399;
+}
 .sudoku-container {
   display: flex;
   flex-direction: column;
@@ -23,18 +102,6 @@
   outline: none;
 }
 /* Bold outline for 2x3 grids */
-.sudoku-board .bold-bottom {
-  border-bottom: 2px solid #1A2A80 !important;
-}
-.sudoku-board .bold-right {
-  border-right: 2px solid #1A2A80 !important;
-}
-.sudoku-board .bold-left {
-  border-left: 2px solid #1A2A80 !important;
-}
-.sudoku-board .bold-top {
-  border-top: 2px solid #1A2A80 !important;
-}
 .sudoku-board input.prefilled {
   background: #D6D5F3;
   color: #000;
@@ -52,11 +119,11 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
-  background: #f5f5fa;
-  padding: 8px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   z-index: 10;
+    background: #f5f5fa;
+    padding: 8px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
 }
 .newgame-btn {
   position: absolute;
@@ -65,7 +132,7 @@
   font-size: 1rem;
   font-weight: bold;
   color: #fff;
-  background: #7A85C1;
+  background: #468A9A;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -143,4 +210,33 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   margin: 0 4px;
   cursor: pointer;
+}
+
+/* Modern cover page option button styles */
+.cover-options {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 32px;
+}
+.cover-option-btn {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #468A9A 60%, #7A85C1 100%);
+  border: none;
+  border-radius: 16px;
+  padding: 16px 40px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(44, 62, 80, 0.12);
+  letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
+  outline: none;
+  margin: 0 8px;
+}
+.cover-option-btn:hover {
+  background: linear-gradient(135deg, #7A85C1 60%, #468A9A 100%);
+  color: #fff;
+  transform: scale(1.07);
+  box-shadow: 0 8px 24px rgba(44, 62, 80, 0.18);
 }
