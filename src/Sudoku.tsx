@@ -98,6 +98,7 @@ function generatePuzzleBoard(): string[][] {
 
 function Sudoku() {
   const [initialBoard, setInitialBoard] = useState<string[][]>(generatePuzzleBoard());
+  const [solutionBoard, setSolutionBoard] = useState<string[][]>(generateFullBoard());
   const [board, setBoard] = useState<string[][]>(initialBoard);
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -112,6 +113,7 @@ function Sudoku() {
   // ...existing code...
   const newInitialBoard = generatePuzzleBoard();
   setInitialBoard(newInitialBoard);
+  setSolutionBoard(generateFullBoard());
   setBoard(newInitialBoard);
   setCompleted(false);
   setStartTime(null);
@@ -235,9 +237,9 @@ function Sudoku() {
                 if (j === 0) cellClass += ' bold-left';
                 if (j === 5) cellClass += ' bold-right';
                 const isPrefilled = initialBoard[i][j] !== '';
-                const isInvalid = !isPrefilled && cell !== '' && !isValid(board, i, j, cell);
+                const isIncorrect = !isPrefilled && cell !== '' && cell !== solutionBoard[i][j];
                 let inputClass = isPrefilled ? 'prefilled' : '';
-                if (isInvalid) inputClass += ' invalid';
+                if (isIncorrect) inputClass += ' invalid';
                 if (selectedCell && selectedCell.row === i && selectedCell.col === j) inputClass += ' selected';
                 return (
                   <td key={j} className={cellClass.trim()} onClick={() => handleCellClick(i, j)}>
@@ -259,15 +261,15 @@ function Sudoku() {
         <table>
           <tbody>
             <tr>
-              <td><button className={`number-btn${selectedNumber === '1' ? ' selected' : ''}`} onClick={() => handleNumberClick('1')}>1</button></td>
-              <td><button className={`number-btn${selectedNumber === '2' ? ' selected' : ''}`} onClick={() => handleNumberClick('2')}>2</button></td>
-              <td><button className={`number-btn${selectedNumber === '3' ? ' selected' : ''}`} onClick={() => handleNumberClick('3')}>3</button></td>
-              <td><button className={`number-btn${selectedNumber === 'X' ? ' selected' : ''}`} onClick={() => handleNumberClick('X')}>&#10006;</button></td>
+              <td><button className={`number-btn${selectedNumber === '1' ? ' selected' : ''}`} onClick={e => { handleNumberClick('1'); e.currentTarget.blur(); }}>1</button></td>
+              <td><button className={`number-btn${selectedNumber === '2' ? ' selected' : ''}`} onClick={e => { handleNumberClick('2'); e.currentTarget.blur(); }}>2</button></td>
+              <td><button className={`number-btn${selectedNumber === '3' ? ' selected' : ''}`} onClick={e => { handleNumberClick('3'); e.currentTarget.blur(); }}>3</button></td>
+              <td><button className={`number-btn${selectedNumber === 'X' ? ' selected' : ''}`} onClick={e => { handleNumberClick('X'); e.currentTarget.blur(); }}>&#10006;</button></td>
             </tr>
             <tr>
-              <td><button className={`number-btn${selectedNumber === '4' ? ' selected' : ''}`} onClick={() => handleNumberClick('4')}>4</button></td>
-              <td><button className={`number-btn${selectedNumber === '5' ? ' selected' : ''}`} onClick={() => handleNumberClick('5')}>5</button></td>
-              <td><button className={`number-btn${selectedNumber === '6' ? ' selected' : ''}`} onClick={() => handleNumberClick('6')}>6</button></td>
+              <td><button className={`number-btn${selectedNumber === '4' ? ' selected' : ''}`} onClick={e => { handleNumberClick('4'); e.currentTarget.blur(); }}>4</button></td>
+              <td><button className={`number-btn${selectedNumber === '5' ? ' selected' : ''}`} onClick={e => { handleNumberClick('5'); e.currentTarget.blur(); }}>5</button></td>
+              <td><button className={`number-btn${selectedNumber === '6' ? ' selected' : ''}`} onClick={e => { handleNumberClick('6'); e.currentTarget.blur(); }}>6</button></td>
             </tr>
           </tbody>
         </table>
