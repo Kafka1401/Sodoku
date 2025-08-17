@@ -1,0 +1,62 @@
+/* Shape Sudoku specific styles */
+.shape-sudoku-board {
+  border-collapse: collapse;
+}
+.shape-sudoku-board td {
+  border: 1px solid #468A9A; /* Regular thin border, no bold lines */
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  padding: 0;
+  background: #F7F6FB;
+}
+.shape-sudoku-board .prefilled {
+  background: #E3F2FD;
+}
+.shape-sudoku-board .invalid {
+  background: #FFD6D6;
+  color: #d9534f;
+  font-weight: bold;
+}
+.shape-sudoku-board .selected {
+  border: 2px solid #7A85C1;
+}
+.shape-number-array {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24px;
+  width: 100%;
+}
+.shape-number-array table {
+  border-collapse: separate;
+  border-spacing: 4px 4px;
+  margin: 0 auto;
+}
+.shape-number-array td {
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+.shape-number-btn {
+  width: auto;
+  height: auto;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #468A9A;
+  background: none;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  margin: 0;
+}
+.shape-number-btn.selected {
+  border: 2px solid #7A85C1;
+  background: #F7F6FB;
+  color: #468A9A;
+}

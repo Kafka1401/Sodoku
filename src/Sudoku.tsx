@@ -253,12 +253,15 @@ function Sudoku({ variant = 'classic' }: SudokuProps) {
             <tr key={i}>
               {row.map((cell, j) => {
                 let cellClass = '';
-                if (i % 2 === 1 && i !== 5) cellClass += ' bold-bottom';
-                if (j % 3 === 2 && j !== 5) cellClass += ' bold-right';
-                if (i === 0) cellClass += ' bold-top';
-                if (i === 5) cellClass += ' bold-bottom';
-                if (j === 0) cellClass += ' bold-left';
-                if (j === 5) cellClass += ' bold-right';
+                // Only apply bold border classes for classic variant
+                if (variant === 'classic') {
+                  if (i % 2 === 1 && i !== 5) cellClass += ' bold-bottom';
+                  if (j % 3 === 2 && j !== 5) cellClass += ' bold-right';
+                  if (i === 0) cellClass += ' bold-top';
+                  if (i === 5) cellClass += ' bold-bottom';
+                  if (j === 0) cellClass += ' bold-left';
+                  if (j === 5) cellClass += ' bold-right';
+                }
                 const isPrefilled = initialBoard[i][j] !== '';
                 // Mark cell invalid only if it violates Sudoku rules
                 const isIncorrect = !isPrefilled && cell !== '' && !isValid(board, i, j, cell);
