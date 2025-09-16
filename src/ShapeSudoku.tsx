@@ -140,7 +140,7 @@ const ShapeSudoku = () => {
   };
   // Handler for Back button
   const handleBack = () => {
-    window.location.href = '/'; // If using routing, replace with navigation logic
+  window.location.href = '/Sodoku/'; // For GitHub Pages deployment
   };
   const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
   const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
