@@ -124,6 +124,10 @@ function generatePuzzleBoard(): string[][] {
 
 
 function Sudoku() {
+  // Handler for Back button
+  const handleBack = () => {
+    window.location.href = '/'; // If using routing, replace with navigation logic
+  };
   const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
   const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
   const [board, setBoard] = useState<string[][]>(initialBoard);
@@ -269,11 +273,38 @@ function Sudoku() {
   }
 
   return (
-    <div className="sudoku-container">
+    <>
+      <button
+        className="back-btn"
+        style={{
+          position: 'fixed',
+          top: 20,
+          left: 'calc(50% - 20em)', // Move 20 paces (em) to the left
+          transform: 'translateX(-50%)',
+          zIndex: 1000,
+          fontSize: '1.1rem',
+          background: '#5D2F77',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px',
+          padding: '8px 20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          transition: 'background 0.2s',
+        }}
+        onClick={handleBack}
+        onMouseOver={e => (e.currentTarget.style.background = '#43205a')}
+        onMouseOut={e => (e.currentTarget.style.background = '#5D2F77')}
+      >
+  <span role="img" aria-label="Home">🏠</span>
+      </button>
       <button
         className="newgame-btn"
+        style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}}
         onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
       >New Game</button>
+      <div className="sudoku-container">
       <h2>6x6 Sudoku</h2>
       <div className="timer-top-right">Time: {formatTime(completed && endTime ? endTime - (startTime ?? 0) : elapsed)}</div>
       <table className="sudoku-board">
@@ -348,6 +379,7 @@ function Sudoku() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

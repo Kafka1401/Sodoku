@@ -127,6 +127,21 @@ function generatePuzzleBoardFromSolution(solution: string[][]): string[][] {
 }
 
 const ShapeSudoku = () => {
+  // Handler for clearing a cell
+  const handleClearCell = () => {
+    if (!selectedCell) return;
+    const { row, col } = selectedCell;
+    if (initialBoard[row][col] !== '') return;
+    const newBoard = board.map((r, i) =>
+      r.map((cell, j) => (i === row && j === col ? '' : cell))
+    );
+    setBoard(newBoard);
+    setSelectedShape(null);
+  };
+  // Handler for Back button
+  const handleBack = () => {
+    window.location.href = '/'; // If using routing, replace with navigation logic
+  };
   const [solutionBoard, setSolutionBoard] = useState<string[][]>(() => generateFullBoard());
   const [initialBoard, setInitialBoard] = useState<string[][]>(() => generatePuzzleBoardFromSolution(solutionBoard));
   const [board, setBoard] = useState<string[][]>(initialBoard);
@@ -187,21 +202,51 @@ const ShapeSudoku = () => {
   };
 
   const handleNewGame = () => {
-    const newSolution = generateFullBoard();
-    const newInitial = generatePuzzleBoardFromSolution(newSolution);
-    setSolutionBoard(newSolution);
-    setInitialBoard(newInitial);
-    setBoard(newInitial);
-    setSelectedCell(null);
-    setSelectedShape(null);
-    setCompleted(false);
-    setStartTime(null);
-    setEndTime(null);
+  const newSolution = generateFullBoard();
+  const newInitial = generatePuzzleBoardFromSolution(newSolution);
+  setSolutionBoard(newSolution);
+  setInitialBoard(newInitial);
+  setBoard(newInitial);
+  setSelectedCell(null);
+  setSelectedShape(null);
+  setCompleted(false);
+  setStartTime(null);
+  setEndTime(null);
+  setTimer(0); // Reset timer when starting a new game
   };
 
   return (
     <>
-      <button className="newgame-btn" style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}} onClick={handleNewGame}>
+      <button
+        className="back-btn"
+        style={{
+          position: 'fixed',
+          top: 20,
+          left: 'calc(50% - 20em)', // Move 20 paces (em) to the left
+          transform: 'translateX(-50%)',
+          zIndex: 1000,
+          fontSize: '1.1rem',
+          background: '#5D2F77',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px',
+          padding: '8px 20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          transition: 'background 0.2s',
+        }}
+        onClick={handleBack}
+        onMouseOver={e => (e.currentTarget.style.background = '#43205a')}
+        onMouseOut={e => (e.currentTarget.style.background = '#5D2F77')}
+      >
+  <span role="img" aria-label="Home">🏠</span>
+      </button>
+      <button
+        className="newgame-btn"
+        style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}}
+        onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
+      >
         New Game
       </button>
       <div className="timer-top-right" style={{position: 'fixed', top: 20, right: 40, fontSize: '1.2rem', fontWeight: 'bold', color: '#333', background: '#f5f5fa', padding: '8px 16px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', zIndex: 10}}>
@@ -251,6 +296,17 @@ const ShapeSudoku = () => {
                     </button>
                   </td>
                 ))}
+                {/* Cross button for clearing cell */}
+                <td>
+                  <button
+                    className="number-btn clear-btn"
+                    title="Clear cell"
+                    onClick={e => { handleClearCell(); e.currentTarget.blur(); }}
+                    style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#c00', background: '#fff', border: '2px solid #c00', borderRadius: '6px', padding: '0 10px', marginLeft: '8px' }}
+                  >
+                    &#10006;
+                  </button>
+                </td>
               </tr>
               <tr>
                 {SHAPES.slice(3).map((shape) => (

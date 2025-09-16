@@ -1,3 +1,21 @@
+@media (prefers-color-scheme: dark) {
+  .sudoku-board {
+    border: 2px solid #e0e0ff !important; /* Light lavender for outer grid in dark mode */
+  }
+  .sudoku-board td,
+  .sudoku-board .bold-bottom,
+  .sudoku-board .bold-right,
+  .sudoku-board .bold-left,
+  .sudoku-board .bold-top {
+    border-color: #e0e0ff !important; /* Light lavender for dark mode grid lines */
+  }
+  .sudoku-board td.invalid {
+    border-color: #ff8a80 !important;
+  }
+  .sudoku-board td.selected {
+    border-color: #b3b3ff !important;
+  }
+}
 .sudoku-container {
   display: flex;
   flex-direction: column;
