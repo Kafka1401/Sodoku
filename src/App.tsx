@@ -1,6 +1,4 @@
-
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Sudoku from './Sudoku';
 import ShapeSudoku from './ShapeSudoku';
 import CoverPage from './CoverPage';
