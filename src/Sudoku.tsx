@@ -229,11 +229,16 @@ function Sudoku() {
   return (
     <>
       <button
+        className="newgame-btn"
+        style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}}
+        onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
+      >New Game</button>
+      <button
         className="back-btn"
         style={{
           position: 'fixed',
           top: 20,
-          left: 'calc(50% - 20em)', // Move 20 paces (em) to the left
+          left: 'calc(50% - 20em)',
           transform: 'translateX(-50%)',
           zIndex: 1000,
           fontSize: '1.1rem',
@@ -251,13 +256,35 @@ function Sudoku() {
         onMouseOver={e => (e.currentTarget.style.background = '#43205a')}
         onMouseOut={e => (e.currentTarget.style.background = '#5D2F77')}
       >
-  <span role="img" aria-label="Home">🏠</span>
+        <span role="img" aria-label="Home">🏠</span>
       </button>
-      <button
-        className="newgame-btn"
-        style={{position: 'fixed', top: 20, left: 20, zIndex: 1000}}
-        onClick={e => { handleNewGame(); e.currentTarget.blur(); }}
-      >New Game</button>
+      {/* Responsive style for mobile screens: home button below new game */}
+      <style>
+        {`
+          @media (max-width: 600px) {
+            .newgame-btn {
+              position: fixed !important;
+              top: 10px !important;
+              left: 10px !important;
+              font-size: 1.2rem !important;
+              padding: 10px 18px !important;
+              border-radius: 8px !important;
+            }
+            .back-btn {
+              position: fixed !important;
+              top: 60px !important;
+              left: 10px !important;
+              font-size: 1.5rem !important;
+              padding: 12px 22px !important;
+              border-radius: 10px !important;
+              min-width: 48px !important;
+              min-height: 48px !important;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+              transform: none !important;
+            }
+          }
+        `}
+      </style>
       <div className="sudoku-container">
       <h2>6x6 Sudoku</h2>
       <div className="timer-top-right">Time: {formatTime(completed && endTime ? endTime - (startTime ?? 0) : elapsed)}</div>
